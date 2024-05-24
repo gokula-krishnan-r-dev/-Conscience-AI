@@ -1,0 +1,39 @@
+version: "2"
+services:
+  nodejs-api:
+    build: ./nodejs-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+
+  python-consumer:
+    build: ./python-consumer
+    depends_on:
+      - rabbitmq
+      - mongo
+    environment:
+      MONGODB_URI: "mongodb+srv://gokul:UPw3fCb6kDmF5CsE@cluster0.klfb9oe.mongodb.net/?retryWrites=true&w=majority"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+
+  mongo:
+    image: mongo:4.4
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  mongo_data:
